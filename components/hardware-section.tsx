@@ -1,10 +1,10 @@
 "use client"
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Cpu, Cog, Radio, CircuitBoard, Wifi, Gauge } from "lucide-react"
+import { Cpu, Radio, CircuitBoard, Wifi, Gauge } from "lucide-react"
 import Image from "next/image"
+import { STLViewer } from "@/components/stl-viewer"
 
 const components = [
   {
@@ -102,29 +102,15 @@ export function HardwareSection() {
               <CardHeader>
                 <CardTitle className="text-foreground">Visor 3D Interactivo</CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  Explora el modelo CAD del robot ROBO-EDU en 3D
+                  Vista previa interactiva del robot - Haz clic en el botón para ver el modelo STL completo en GitHub
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl flex items-center justify-center border border-border overflow-hidden relative">
-                  <div className="text-center space-y-4 p-8">
-                    <div className="w-20 h-20 mx-auto rounded-full bg-primary/20 flex items-center justify-center">
-                      <Cog className="w-10 h-10 text-primary animate-spin" style={{ animationDuration: "8s" }} />
-                    </div>
-                    <p className="text-white font-medium">ROBO-EDU-ESP32-3D.stl</p>
-                    <p className="text-sm text-slate-400">
-                      Coloca tu archivo STL en:{" "}
-                      <code className="bg-slate-700 px-2 py-1 rounded text-xs">/public/models/</code>
-                    </p>
-                    <a
-                      href="https://github.com/edumillones/ROBO-EDU-ESP32"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-primary hover:underline text-sm"
-                    >
-                      Ver archivos CAD en GitHub
-                    </a>
-                  </div>
+                <div className="aspect-video rounded-xl overflow-hidden border border-border">
+                  <STLViewer
+                    modelPath="/models/ROBO-EDU-ESP32-3D.stl"
+                    githubRawUrl="https://github.com/edumillones/ROBO-EDU-ESP32/blob/main/landing-page/public/models/ROBO-EDU-ESP32-3D.stl"
+                  />
                 </div>
               </CardContent>
             </Card>
