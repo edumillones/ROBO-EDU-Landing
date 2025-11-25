@@ -116,7 +116,7 @@ export function HardwareSection() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="diagram">
+<TabsContent value="diagram">
             <Card>
               <CardHeader>
                 <CardTitle className="text-foreground">Esquemático Electrónico</CardTitle>
@@ -125,12 +125,14 @@ export function HardwareSection() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-muted rounded-xl flex items-center justify-center border-2 border-dashed border-border">
-                  <div className="text-center space-y-4 p-8">
-                    <CircuitBoard className="w-16 h-16 text-muted-foreground mx-auto" />
-                    <p className="text-muted-foreground">Espacio para diagrama esquemático</p>
-                    <p className="text-xs text-muted-foreground/60">Fritzing / KiCad Export</p>
-                  </div>
+                {/* Modificación: Se reemplazó el placeholder por el componente Image */}
+                <div className="aspect-video relative rounded-xl overflow-hidden border border-border bg-white flex items-center justify-center">
+                  <Image
+                    src="/images/esquematico-robo-edu.jpeg" // <--- Asegúrate que la extensión sea correcta (.png, .jpg, etc)
+                    alt="Diagrama esquemático del ROBO-EDU"
+                    fill
+                    className="object-contain p-2" // 'object-contain' asegura que se vea todo el diagrama sin recortarse
+                  />
                 </div>
               </CardContent>
             </Card>
