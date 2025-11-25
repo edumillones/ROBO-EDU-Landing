@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles, Cpu } from "lucide-react"
 
 export function HeroSection() {
   return (
-    <section id="inicio" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+    <section id="inicio" className="relative min-h-screen flex items-center pt-16 overflow-hidden bg-background">
       {/* Background Pattern */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%)]" />
@@ -20,10 +20,10 @@ export function HeroSection() {
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8">
+          <div className="space-y-8 animate-in fade-in slide-in-from-left-5 duration-700">
             <Badge
               variant="secondary"
-              className="px-4 py-2 text-sm font-medium bg-accent/10 text-accent border-accent/20 hover:bg-accent/15"
+              className="px-4 py-2 text-sm font-medium bg-accent/10 text-accent border-accent/20 hover:bg-accent/15 backdrop-blur-sm"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Proyecto Alineado a ODS 4: Educación de Calidad
@@ -39,13 +39,13 @@ export function HeroSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" asChild className="group">
+              <Button size="lg" asChild className="group shadow-lg shadow-primary/20">
                 <a href="#ia">
                   Ver el Cerebro del Robot
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="backdrop-blur-sm bg-background/50">
                 <a href="#hardware">
                   <Cpu className="mr-2 w-4 h-4" />
                   Explorar Hardware
@@ -70,22 +70,36 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right Content - 3D Model Placeholder */}
-          <div className="relative">
-            <div className="aspect-square max-w-lg mx-auto rounded-3xl bg-card border border-border shadow-xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center space-y-4 p-8">
-                  <div className="w-32 h-32 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <Cpu className="w-16 h-16 text-primary" />
-                  </div>
-                  <p className="text-muted-foreground text-sm">Espacio para modelo 3D interactivo</p>
-                  <p className="text-xs text-muted-foreground/60">Spline / Sketchfab Embed</p>
-                </div>
-              </div>
+          {/* Right Content - Robot Image */}
+          <div className="relative animate-in fade-in slide-in-from-right-5 duration-700 delay-200">
+            <div className="aspect-square max-w-lg mx-auto rounded-3xl bg-card border border-border shadow-2xl overflow-hidden relative group">
+              {/* Background gradient effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+              
+              {/* IMAGEN PRINCIPAL DEL ROBOT */}
+              <img 
+                src="/images/ROBO-EDU-3D-IA.png" 
+                alt="Prototipo Robo-Edu" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              
               {/* Decorative elements */}
-              <div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-accent animate-pulse" />
-              <div className="absolute bottom-4 left-4 w-2 h-2 rounded-full bg-primary/60" />
+              <div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-accent animate-pulse shadow-[0_0_15px_theme(colors.accent.DEFAULT)] z-20" />
+              <div className="absolute bottom-4 left-4 w-2 h-2 rounded-full bg-primary/60 z-20" />
+              
+              {/* Optional: Tech Overlay Grid */}
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+            </div>
+
+            {/* Floating Badge (Tarjeta Flotante) */}
+            <div className="absolute -bottom-6 -left-6 bg-card/80 backdrop-blur-md border border-border p-4 rounded-xl shadow-xl hidden md:flex items-center gap-3 animate-bounce-slow">
+               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                 <Cpu size={20} />
+               </div>
+               <div>
+                 <p className="text-sm font-bold text-foreground">Versión 2.0</p>
+                 <p className="text-xs text-muted-foreground">Sistema Experto Activo</p>
+               </div>
             </div>
           </div>
         </div>

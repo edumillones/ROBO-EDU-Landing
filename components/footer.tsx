@@ -24,7 +24,7 @@ export function Footer() {
 
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com"
+              href="https://github.com/edumillones/ROBO-EDU-ESP32"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -35,7 +35,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/eduardomillones/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"

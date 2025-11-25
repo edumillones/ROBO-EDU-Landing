@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Brain, Gauge, AlertTriangle, Eye, Compass } from "lucide-react"
 
+// Función matemática de Lógica Difusa (Triangular)
 function fuzzyGrade(val: number, low: number, peak: number, high: number): number {
   if (val <= low || val >= high) return 0.0
   if (val === peak) return 1.0
@@ -15,17 +16,28 @@ function fuzzyGrade(val: number, low: number, peak: number, high: number): numbe
 }
 
 export function FuzzyLogicSection() {
+  // Estado inicial: 30cm (Distancia media)
   const [distance, setDistance] = useState([30])
 
+  // Cálculo en tiempo real del Sistema Experto
   const fuzzyValues = useMemo(() => {
     const dist = distance[0]
-    const isClose = fuzzyGrade(dist, -1, 0, 25)
-    const isMedium = fuzzyGrade(dist, 15, 30, 45)
-    const isFar = fuzzyGrade(dist, 35, 60, 80)
 
-    // Defuzzification
+    // 1. FUSIFICACIÓN (Entradas Crisp -> Variables Lingüísticas)
+    const isClose = fuzzyGrade(dist, -1, 0, 25)    // Pico en 0cm
+    const isMedium = fuzzyGrade(dist, 15, 30, 45)  // Pico en 30cm
+    
+    // CORRECCIÓN AQUI:
+    // Antes: fuzzyGrade(dist, 35, 60, 80) -> Caía a 0 en 80cm
+    // Ahora: fuzzyGrade(dist, 35, 80, 120) -> Pico en 80cm (Max slider)
+    const isFar = fuzzyGrade(dist, 35, 80, 120) 
+
+    // 2. DESFUSIFICACIÓN (Método del Centroide)
+    // Reglas: Cerca=0 (Stop), Medio=120 (Lento), Lejos=180 (Rápido)
     const num = isClose * 0 + isMedium * 120 + isFar * 180
     const den = isClose + isMedium + isFar
+    
+    // Evitamos división por cero y redondeamos
     const speed = den > 0 ? Math.round(num / den) : 100
 
     return {
@@ -36,24 +48,25 @@ export function FuzzyLogicSection() {
     }
   }, [distance])
 
+  // Helpers para colores dinámicos
   const getSpeedColor = (speed: number) => {
-    if (speed < 50) return "text-destructive"
-    if (speed < 120) return "text-chart-3"
-    return "text-accent"
+    if (speed < 50) return "text-destructive" // Rojo
+    if (speed < 150) return "text-orange-500" // Naranja
+    return "text-green-500" // Verde
   }
 
   const getSpeedLabel = (speed: number) => {
-    if (speed < 50) return "DETENIDO"
-    if (speed < 100) return "LENTO"
-    if (speed < 150) return "MODERADO"
-    return "RÁPIDO"
+    if (speed < 50) return "DETENIDO (PRECAUCIÓN)"
+    if (speed < 130) return "LENTO (OBSERVACIÓN)"
+    return "RÁPIDO (EXPLORACIÓN)"
   }
 
   return (
-    <section id="ia" className="py-24">
+    <section id="ia" className="py-24 bg-slate-50/50 dark:bg-slate-950/50">
       <div className="container mx-auto px-4">
+        {/* Header de la Sección */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge variant="outline" className="mb-4">
+          <Badge variant="outline" className="mb-4 border-primary text-primary">
             <Brain className="w-4 h-4 mr-2" />
             Sistema Experto
           </Badge>
@@ -62,152 +75,167 @@ export function FuzzyLogicSection() {
           </h2>
           <p className="text-lg text-muted-foreground text-pretty">
             A diferencia de la lógica tradicional (0 o 1), ROBO-EDU percibe el mundo en{" "}
-            <strong>grados de verdad</strong>, tomando decisiones suaves como un humano.
+            <strong className="text-foreground">grados de verdad</strong>, tomando decisiones suaves y seguras.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Simulator Panel */}
-          <Card className="border-2 border-primary/20">
+          
+          {/* Panel Izquierdo: Simulador de Entrada */}
+          <Card className="border-2 border-primary/20 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Gauge className="w-5 h-5 text-primary" />
                 Simulador de Sensor Ultrasónico
               </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Mueve el slider para simular la distancia detectada por el sensor
+              <CardDescription>
+                Mueve el slider para simular la distancia al objeto detectada
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-              {/* Distance Slider */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-foreground">Distancia al Objeto</span>
-                  <Badge variant="secondary" className="text-lg px-3 py-1">
-                    {distance[0]} cm
-                  </Badge>
+              
+              {/* Slider de Distancia */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-end">
+                  <span className="text-sm font-medium text-muted-foreground">Entrada del Sensor</span>
+                  <div className="text-right">
+                    <span className="text-4xl font-bold text-foreground">{distance[0]}</span>
+                    <span className="text-muted-foreground ml-1">cm</span>
+                  </div>
                 </div>
-                <Slider value={distance} onValueChange={setDistance} max={80} min={0} step={1} className="py-4" />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>0 cm (Muy cerca)</span>
-                  <span>80 cm (Lejos)</span>
+                
+                <Slider 
+                  value={distance} 
+                  onValueChange={setDistance} 
+                  max={80} 
+                  min={0} 
+                  step={1} 
+                  className="py-2 cursor-pointer" 
+                />
+                
+                <div className="flex justify-between text-xs text-muted-foreground font-mono uppercase tracking-wider">
+                  <span>0 cm (Peligro)</span>
+                  <span>80 cm (Libre)</span>
                 </div>
               </div>
 
-              {/* Fuzzy Membership Bars */}
-              <div className="space-y-6">
-                <h4 className="text-sm font-semibold text-foreground">Variables Lingüísticas (Fusificación)</h4>
+              {/* Barras de Membresía (Fusificación) */}
+              <div className="space-y-6 pt-4 border-t">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Brain className="w-4 h-4" />
+                  Variables Lingüísticas (Interpretación)
+                </h4>
 
-                {/* Close */}
+                {/* Variable: Cerca */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-destructive" />
-                      <span className="text-sm font-medium text-foreground">Cerca (Precaución)</span>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-destructive font-medium">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>Cerca (Precaución)</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{fuzzyValues.close}%</span>
+                    <span className="font-mono">{fuzzyValues.close}%</span>
                   </div>
-                  <Progress value={fuzzyValues.close} className="h-3 [&>div]:bg-destructive" />
+                  <Progress value={fuzzyValues.close} className="h-2 bg-destructive/20 [&>div]:bg-destructive" />
                 </div>
 
-                {/* Medium */}
+                {/* Variable: Medio */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-chart-3" />
-                      <span className="text-sm font-medium text-foreground">Medio (Observación)</span>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-orange-500 font-medium">
+                      <Eye className="w-4 h-4" />
+                      <span>Medio (Observación)</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{fuzzyValues.medium}%</span>
+                    <span className="font-mono">{fuzzyValues.medium}%</span>
                   </div>
-                  <Progress value={fuzzyValues.medium} className="h-3 [&>div]:bg-chart-3" />
+                  <Progress value={fuzzyValues.medium} className="h-2 bg-orange-500/20 [&>div]:bg-orange-500" />
                 </div>
 
-                {/* Far */}
+                {/* Variable: Lejos */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Compass className="w-4 h-4 text-accent" />
-                      <span className="text-sm font-medium text-foreground">Lejos (Exploración)</span>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-green-500 font-medium">
+                      <Compass className="w-4 h-4" />
+                      <span>Lejos (Exploración)</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{fuzzyValues.far}%</span>
+                    <span className="font-mono">{fuzzyValues.far}%</span>
                   </div>
-                  <Progress value={fuzzyValues.far} className="h-3 [&>div]:bg-accent" />
+                  <Progress value={fuzzyValues.far} className="h-2 bg-green-500/20 [&>div]:bg-green-500" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Output Panel */}
-          <Card className="bg-card">
+          {/* Panel Derecho: Salida del Sistema */}
+          <Card className="bg-card shadow-lg flex flex-col h-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Brain className="w-5 h-5 text-primary" />
-                Salida del Sistema Experto
+                Salida del Motor de Inferencia
               </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Resultado de la desfusificación (Método del centroide)
+              <CardDescription>
+                Decisión final calculada por el método del centroide
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Speed Gauge */}
+            <CardContent className="flex-1 flex flex-col justify-between">
+              
+              {/* Velocímetro SVG */}
               <div className="flex flex-col items-center justify-center py-8">
-                <div className="relative w-48 h-48">
+                <div className="relative w-56 h-56 transition-all duration-300">
+                  {/* Círculo de fondo */}
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    {/* Background arc */}
                     <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
+                      cx="50" cy="50" r="40"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="12"
-                      className="text-muted"
-                      strokeLinecap="round"
-                      strokeDasharray="188.5"
-                      strokeDashoffset="47"
+                      strokeWidth="8"
+                      className="text-muted/30"
                     />
-                    {/* Value arc */}
+                    {/* Arco de Valor */}
                     <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
+                      cx="50" cy="50" r="40"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="12"
+                      strokeWidth="8"
                       className={getSpeedColor(fuzzyValues.speed)}
                       strokeLinecap="round"
-                      strokeDasharray="188.5"
-                      strokeDashoffset={188.5 - (fuzzyValues.speed / 200) * 141}
-                      style={{ transition: "stroke-dashoffset 0.3s ease" }}
+                      strokeDasharray="251.2"
+                      strokeDashoffset={251.2 - (fuzzyValues.speed / 255) * 251.2} // Ajustado a max 255 PWM
+                      style={{ transition: "stroke-dashoffset 0.5s ease-out, color 0.3s" }}
                     />
                   </svg>
+                  
+                  {/* Texto Central */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-4xl font-bold ${getSpeedColor(fuzzyValues.speed)}`}>
+                    <span className={`text-5xl font-bold tracking-tighter ${getSpeedColor(fuzzyValues.speed)}`}>
                       {fuzzyValues.speed}
                     </span>
-                    <span className="text-sm text-muted-foreground">PWM</span>
+                    <span className="text-sm font-semibold text-muted-foreground mt-1">PWM</span>
                   </div>
                 </div>
-                <Badge variant="outline" className={`mt-4 text-lg px-4 py-2 ${getSpeedColor(fuzzyValues.speed)}`}>
+
+                <Badge variant="outline" className={`mt-6 text-lg px-6 py-2 transition-colors duration-300 ${getSpeedColor(fuzzyValues.speed)} border-current`}>
                   {getSpeedLabel(fuzzyValues.speed)}
                 </Badge>
               </div>
 
-              {/* Rules Applied */}
-              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                <h4 className="text-sm font-semibold text-foreground">Reglas Aplicadas:</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <code className="text-destructive">R1:</code>
-                    <span>Si CERCA → Velocidad = 0 (Precaución)</span>
+              {/* Explicación de Reglas */}
+              <div className="bg-muted/50 rounded-xl p-5 text-sm space-y-3 border">
+                <h4 className="font-semibold text-foreground flex items-center gap-2">
+                  <Compass className="w-4 h-4" />
+                  Base de Conocimiento (Reglas):
+                </h4>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className={`flex items-start gap-2 transition-opacity ${fuzzyValues.close > 0 ? 'opacity-100 font-medium text-destructive' : 'opacity-40'}`}>
+                    <code className="bg-background px-1 rounded border">R1</code>
+                    <span>Si CERCA → Velocidad 0 (Stop)</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <code className="text-chart-3">R2:</code>
-                    <span>Si MEDIO → Velocidad = 120 (Observación)</span>
+                  <li className={`flex items-start gap-2 transition-opacity ${fuzzyValues.medium > 0 ? 'opacity-100 font-medium text-orange-500' : 'opacity-40'}`}>
+                    <code className="bg-background px-1 rounded border">R2</code>
+                    <span>Si MEDIO → Velocidad 120 (Obs)</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <code className="text-accent">R3:</code>
-                    <span>Si LEJOS → Velocidad = 180 (Exploración)</span>
+                  <li className={`flex items-start gap-2 transition-opacity ${fuzzyValues.far > 0 ? 'opacity-100 font-medium text-green-500' : 'opacity-40'}`}>
+                    <code className="bg-background px-1 rounded border">R3</code>
+                    <span>Si LEJOS → Velocidad 180 (Expl)</span>
                   </li>
                 </ul>
               </div>
